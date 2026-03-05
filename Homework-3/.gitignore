@@ -1,0 +1,8 @@
+# LaTeX source and build artifacts
+*.tex
+*.log
+*.aux
+*.out
+
+# NumPy intermediate results
+results/*.npy
