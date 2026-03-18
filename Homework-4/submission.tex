@@ -1,0 +1,46 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=blue, linkcolor=blue}
+\newcommand{\repo}{https://github.com/Achuthan2909/Sequential-Decision-Making}
+
+\begin{document}
+
+\begin{center}
+{\Large DS 592: Introduction to Sequential Decision Making}\\[4pt]
+{\Large Homework 4 --- Submission}\\[6pt]
+Achuthan Rathinam\\
+March 2026
+\end{center}
+
+\vspace{0.8em}
+
+All submission files are in this repository folder:
+\begin{center}
+\href{\repo/tree/main/Homework-4}{\texttt{Homework-4/}}
+\end{center}
+
+All submission files are also hosted in the GitHub repository: \\
+\href{\repo}{\texttt{github.com/Achuthan2909/Sequential-Decision-Making}}
+
+\section*{Theory}
+\begin{itemize}
+  \item \href{\repo/blob/main/Homework-4/theory_solutions.pdf}{\texttt{theory\_solutions.pdf}} --- full solution for the Multi-Dimensional Bandits theory problem.
+  \item Includes the main $\ell_\infty$ analysis and bonus parts for $\ell_2$, $\ell_1$, and instance-dependent regret.
+\end{itemize}
+
+\section*{Programming Assignment: Empirical Analysis of Multi-Armed Bandit Algorithms}
+\begin{itemize}
+  \item \href{\repo/blob/main/Homework-4/hw4_bandit_analysis.py}{\texttt{hw4\_bandit\_analysis.py}} --- implementation of UCB and Thompson Sampling, simulations, and plot generation.
+  \item \href{\repo/blob/main/Homework-4/report.md}{\texttt{report.md}} --- analysis write-up for Part I (Bayesian regret) and Part II (frequentist regret).
+  \item \href{\repo/blob/main/Homework-4/README.md}{\texttt{README.md}} --- run instructions and posterior sampling rules.
+  \item \href{\repo/tree/main/Homework-4/output}{\texttt{output/}} --- generated outputs:
+  \begin{itemize}
+    \item \href{\repo/blob/main/Homework-4/output/part1_bayes_regret.png}{\texttt{part1\_bayes\_regret.png}}
+    \item \href{\repo/blob/main/Homework-4/output/part2_frequentist_regret.png}{\texttt{part2\_frequentist\_regret.png}}
+    \item saved \href{\repo/tree/main/Homework-4/output}{\texttt{.npy}} arrays for all reported curves
+  \end{itemize}
+\end{itemize}
+
+\end{document}

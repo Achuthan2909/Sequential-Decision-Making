@@ -1,0 +1,257 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+
+\newcommand{\hwk}{Homework \#4}
+\newcommand{\reading}{Due: March 19, at 11:59 pm}
+\pagestyle{empty}
+
+\newcommand{\distB}[1]{\min_{\mu \in \mathcal{B}} \left\| #1 - \mu \right\|_{\infty}}
+
+\begin{document}
+
+\begin{center}
+\begin{tabular*}{6.44in}{|l @{\extracolsep{\fill}}c r|} \hline
+ & & \\
+\hspace*{5pt} \bfseries DS 592 Introduction to Sequential Decision Making & & \bfseries \hwk \hspace*{5pt} \\
+\hspace*{5pt} \bfseries Spring 2025 & & \reading \hspace*{5pt} \\
+ & & \\ \hline
+\end{tabular*}
+\end{center}
+
+\noindent
+{\bf Your name:} Achuthan Rathinam\\
+{\bf Your collaborators:} None
+\bigskip
+
+\section*{Problem: Multi-Dimensional Bandits}
+
+We have $K$ arms. Pulling arm $i$ gives a random vector $r_i \in \mathbb{R}^d$ with mean $\mu_i$.
+Each coordinate is $\beta$-subgaussian, and coordinates are independent.
+
+Define
+\[
+d_i := \distB{\mu_i},
+\qquad
+d_\star := \min_{i \in [K]} d_i,
+\qquad
+\Delta_i := d_i - d_\star \ge 0.
+\]
+Our regret is
+\[
+\mathrm{Regret}_{\mathcal{B}}^{\|\cdot\|_\infty}(n)
+=
+\mathbb{E}\!\left[\sum_{t=1}^n (d_{a_t}-d_\star)\right]
+=
+\mathbb{E}\!\left[\sum_{t=1}^n \Delta_{a_t}\right].
+\]
+
+\subsection*{Algorithm (LCB-style for distance to $\mathcal{B}$)}
+
+At time $t$, let $N_i(t)$ be number of pulls of arm $i$ before round $t$, and $\hat{\mu}_i(t)$ its empirical mean vector.
+Use confidence radius
+\[
+c_i(t) =
+\beta \sqrt{\frac{2\log C}{N_i(t)}},
+\qquad
+C := 8Knd\max(B,1).
+\]
+(Initialize by pulling each arm once so $N_i(t)\ge1$.)
+
+For each arm define:
+\[
+\mathrm{LCB}_i(t) := \distB{\hat{\mu}_i(t)} - c_i(t),
+\qquad
+\mathrm{UCB}_i(t) := \distB{\hat{\mu}_i(t)} + c_i(t).
+\]
+
+Play
+\[
+a_t \in \arg\min_{i\in[K]} \mathrm{LCB}_i(t).
+\]
+
+\subsection*{Good event and why it holds with high probability}
+
+For each arm $i$, coordinate $j$, and sample size $s \in \{1,\dots,n\}$:
+\[
+\left| \hat{\mu}_{i,j}^{(s)} - \mu_{i,j} \right|
+\le
+\beta\sqrt{\frac{2\log(4Kdn/\delta)}{s}}.
+\]
+Call this global event $\mathcal{E}$ (all $i,j,s$ at once).
+
+For one fixed $(i,j,s)$, subgaussian concentration gives
+\[
+\mathbb{P}\!\left(
+\left| \hat{\mu}_{i,j}^{(s)} - \mu_{i,j} \right|
+>
+\beta\sqrt{\frac{2\log(4Kdn/\delta)}{s}}
+\right)
+\le
+\frac{\delta}{2Kdn}.
+\]
+Union bound over $Kdn$ triples gives
+\[
+\mathbb{P}(\mathcal{E}) \ge 1-\frac{\delta}{2}.
+\]
+
+So with high probability, for all arms and all rounds:
+\[
+\|\hat{\mu}_i(t)-\mu_i\|_\infty \le c_i(t).
+\]
+
+\subsection*{Key inequality under the good event}
+
+Distance to a closed set is 1-Lipschitz in the same norm:
+\[
+|\distB{x}-\distB{y}| \le \|x-y\|_\infty.
+\]
+Hence on $\mathcal{E}$:
+\[
+d_i \in [\mathrm{LCB}_i(t),\mathrm{UCB}_i(t)].
+\]
+
+If at round $t$ algorithm picks suboptimal arm $i$, then
+\[
+\mathrm{LCB}_i(t)\le \mathrm{LCB}_\star(t)
+\le d_\star,
+\]
+and also $d_i\le \mathrm{LCB}_i(t)+2c_i(t)$, so
+\[
+\Delta_i = d_i-d_\star \le 2c_i(t).
+\]
+
+\subsection*{Gap-free regret bound}
+
+At each time when arm $i$ is selected,
+\[
+\Delta_i \le \min\!\left\{\Delta_i,\;2\beta\sqrt{\frac{2\log C}{N_i(t)}}\right\}.
+\]
+Summing over pulls of arm $i$ (let $N_i(n)$ final pulls):
+\[
+\sum_{s=1}^{N_i(n)} \min\!\left\{\Delta_i,\;2\beta\sqrt{\frac{2\log C}{s}}\right\}
+\le
+4\beta\sqrt{2\log C}\,\sqrt{N_i(n)}.
+\]
+Therefore on $\mathcal{E}$,
+\[
+R_n
+\le
+4\beta\sqrt{2\log C}\sum_{i=1}^K \sqrt{N_i(n)}
+\le
+4\beta\sqrt{2\log C}\,\sqrt{K\sum_{i=1}^K N_i(n)}
+=
+4\beta\sqrt{2Kn\log C}.
+\]
+
+So
+\[
+R_n = O\!\left(\beta\sqrt{Kn\log(Knd\max(B,1))}\right).
+\]
+Adding failure event contribution ($\le n\cdot \mathbb{P}(\mathcal{E}^c)$) keeps the same order.
+
+\subsection*{Why this answers the main question}
+
+The assignment asks for order
+\[
+O\!\left(\beta\sqrt{Kn\log(Knd\max(B,1))}\right),
+\]
+and this is exactly what we got using an LCB rule on distance-to-$\mathcal{B}$.
+
+\newpage
+\section*{Bonus (a): $\ell_2$ norm}
+
+If objective distance is
+\[
+d_i^{(2)} := \min_{\mu\in\mathcal{B}}\|\mu_i-\mu\|_2,
+\]
+then $|d^{(2)}(x)-d^{(2)}(y)|\le \|x-y\|_2$.
+
+From coordinate-wise confidence,
+\[
+\|\hat{\mu}_i-\mu_i\|_2 \le \sqrt{d}\,\|\hat{\mu}_i-\mu_i\|_\infty
+\le \sqrt{d}\,c_i.
+\]
+So we use radius $\tilde c_i^{(2)}=\sqrt d\,c_i$ in LCB/UCB for $\ell_2$ distance, giving
+\[
+R_n^{(2)}
+=
+O\!\left(\beta\sqrt{dKn\log(Knd\max(B,1))}\right).
+\]
+
+\section*{Bonus (b): $\ell_1$ norm}
+
+If objective distance is
+\[
+d_i^{(1)} := \min_{\mu\in\mathcal{B}}\|\mu_i-\mu\|_1,
+\]
+then $|d^{(1)}(x)-d^{(1)}(y)|\le \|x-y\|_1$.
+
+Also,
+\[
+\|\hat{\mu}_i-\mu_i\|_1
+\le d\,\|\hat{\mu}_i-\mu_i\|_\infty
+\le d\,c_i.
+\]
+So radius scales by $d$, and
+\[
+R_n^{(1)}
+=
+O\!\left(\beta d\sqrt{Kn\log(Knd\max(B,1))}\right).
+\]
+
+\paragraph{Dependence on $d$ (sharp comparison).}
+\begin{itemize}[leftmargin=1.5em]
+\item $\ell_\infty$: only logarithmic $d$ dependence (best among these three).
+\item $\ell_2$: extra $\sqrt d$ factor.
+\item $\ell_1$: extra $d$ factor (worst).
+\end{itemize}
+
+\section*{Bonus (c): Instance-dependent bound for $\ell_\infty$}
+
+On a round when suboptimal arm $i$ is played:
+\[
+\Delta_i \le 2\beta\sqrt{\frac{2\log C}{N_i(t)}}.
+\]
+So once
+\[
+N_i(t) > \frac{8\beta^2\log C}{\Delta_i^2},
+\]
+the inequality cannot hold; arm $i$ is no longer selected often.
+Hence
+\[
+N_i(n)\;\lesssim\;\frac{8\beta^2\log C}{\Delta_i^2}+1.
+\]
+Therefore
+\[
+R_n
+=
+\sum_{i:\Delta_i>0}\Delta_i\,\mathbb{E}[N_i(n)]
+\;\lesssim\;
+\sum_{i:\Delta_i>0}
+\left(
+\frac{8\beta^2\log C}{\Delta_i}
+\;+\;
+\Delta_i
+\right).
+\]
+So the instance-dependent order is
+\[
+R_n
+=
+O\!\left(
+\sum_{i:\Delta_i>0}
+\frac{\beta^2\log(Knd\max(B,1))}{\Delta_i}
+\right).
+\]
+
+\section*{Final short summary}
+
+Use an \textbf{LCB-based} rule on estimated distance to $\mathcal{B}$:
+pick the arm with smallest lower confidence bound on its distance to $\mathcal{B}$.
+This gives the required gap-free rate for $\ell_\infty$, extends directly to $\ell_2$ and $\ell_1$ with the expected $d$ factors, and also gives a clean instance-dependent bound.
+
+\end{document}
