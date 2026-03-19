@@ -22,3 +22,6 @@ venv/
 
 # Editor
 .cursor/
+
+# test
+tests/
